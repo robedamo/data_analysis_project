@@ -17,6 +17,7 @@ QUÈ FER QUAN VOLGUEU ACTUALITZAR ELS CANVIS AL REPOSITORI DE GITHUB:
 dels altres i mantindreu el repositori local actualitzat amb el online.
 
 FORMA PER A NO LIAR-LA I MÉS "SEGURA":
+
 git stash #leave your changes aside
 
 git pull #pull current version in website
