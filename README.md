@@ -3,7 +3,7 @@ Repo for the data analysis project for the master
 
 PER TENIR EL REPO FEU EL SEGÜENT:
 
--Primer feu git copy url per copiar el repo al vostre ordinador
+- Primer feu git copy url per copiar el repo al vostre ordinador
 -Després enllaceu la vostra còpia amb el repo:
 	git remote add origin https://github.com/robedamo/data_analysis_project.git
 -Creeu una carpeta amb el vostre nom i poseu els codis a dins. 
