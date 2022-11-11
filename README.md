@@ -15,3 +15,18 @@ QUÈ FER QUAN VOLGUEU ACTUALITZAR ELS CANVIS AL REPOSITORI DE GITHUB:
 - git add . + git commit -m "" + git push per enviar els canvis
 - git pull per sobreescriure el repositori online al local del vostre ordinador. Amb git pull actualitzareu els codis 
 dels altres i mantindreu el repositori local actualitzat amb el online.
+
+FORMA PER A NO LIAR-LA I MÉS "SEGURA":
+git stash #leave your changes aside
+
+git pull #pull current version in website
+
+git stash pop #combine your changes
+
+git add .
+
+git commit -m "Comment here your updates"
+
+git push
+
+Before coming back to work locally: git pull
