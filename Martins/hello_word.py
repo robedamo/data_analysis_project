@@ -7,6 +7,8 @@ Created on Wed Nov  9 17:19:19 2022
 import pandas as pd
 from sodapy import Socrata
 
+#%%
+
 # Unauthenticated client only works with public data sets. Note 'None'
 # in place of application token, and no username or password:
 client = Socrata("analisi.transparenciacatalunya.cat", None)
@@ -23,6 +25,20 @@ results = client.get("vvp8-t2ai", limit=10000)
 
 # Convert to pandas DataFrame
 results_df = pd.DataFrame.from_records(results)
+
+#We have data from 2011. However we will only use the one from 2015 in order 
+#study a more current situation. Moreover, we will work with the data until 
+#2021 because we will relate the number of daily patrols with the population 
+#and there is only population data until 2021.
+
+results_df=results_df.loc[(results_df['any']=='2021') | 
+                          (results_df['any']=='2020') |
+                          (results_df['any']=='2019') |
+                          (results_df['any']=='2018') |
+                          (results_df['any']=='2017') |
+                          (results_df['any']=='2016') |
+                          (results_df['any']=='2015') ]
+                          
 
 #All the strings ARE NOT in the same type of letter!
 abps_serveis=results_df.servei_origen_dotaci.str.upper()
@@ -144,6 +160,7 @@ print(serveis_list_)
 
 #We only ploy the Serveis Regionals
 plt.figure()
+plt.title('Mean daily patrols per RP (2015-2021)')
 plt.bar(serveis_list_[1:],serveis_mean_patrols_list[1:], 0.8, label='RP daily patrols')
 plt.xticks(fontsize=10, rotation=45)
 plt.yticks(fontsize=10)
@@ -154,5 +171,68 @@ print(round(np.mean(serveis_mean_patrols_list[1:])))
 y=np.mean(serveis_mean_patrols_list[1:])
 plt.axhline(y, ls = '--', color = 'red', label = 'Mean of daily patrols of all RP')
 plt.legend()
+
+#%%
+"""
+Now we want to represent the mean number of daily patrols per inhabitant in 
+order to know if it is homhogeneous
+"""
+
+#Firs we import the data of the inhabitants for comarques and then we will
+#classify them for regions policials. 
+
+poblacio_all_df =  pd.read_csv('poblacio_comarques.csv', sep=',', skiprows = 9)
+
+#We will only choose 2015-2021 because some delimitations changed before that.
+#Also, we only want the comarcas and in our data set there is inhabitants per
+#Catalunya, per ambits and per provincia
+poblacio_df=poblacio_all_df[poblacio_all_df.columns[:8]]
+
+poblacio_df = poblacio_df.drop(labels=range(42, 55), axis=0)
+
+#Now we make the mean of the population for each comarca
+mean_comarca = poblacio_df.loc[:, ["2021","2020","2019", "2018", "2017", "2016", "2015"]].mean(axis = 1)
+
+#We obtain the name of the comarques in the same order as the mean of
+#inhabitants
+nom_comarca= poblacio_df[poblacio_df.columns[0]]
+
+#We transform our panda series to lists
+mean_comarques=[]
+comarques=[]
+
+for comarca in nom_comarca:
+    comarques.append(comarca)
+
+for mean in mean_comarca:
+    comarques.append(mean)
+
+#%%
+
+#We have to sum all the inhabitants per comarca in order to obtain the number
+#of inhabitants per RP, which is what we want.
+
+#First, we create the dictionary
+RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
+RP_GIRONA = ['Alt Empordà', 'Gironès', 'Selva', 'Garrotxa', 'Ripollès',
+             "Pla de l'Estany", "Baix Empordà"]
+RP_CENTRAL = ['Osona', 'Berguedà', 'Solsonès', 'Bages', 'Anoia', 'Moianès']
+RP_METROPOLITANA_SUD = ['Baix Llobregat', 'Garraf', 'Alt Penedès']
+RP_CAMP_DE_TARRAGONA = ['Baix Penedès', 'Alt Camp', 'Tarragonès', 'Conca de Barberà', 'Baix Camp','Priorat']
+RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
+RP_PONENT = ['Segrià', 'Garrigiues', "Pla d'Urgell", "Urgell","Segarra", "Noguera", "Garrigues"]
+RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran", "Cerdanya"]
+
+comarques = RP_METROPOLITANA_NORD + RP_GIRONA + RP_CENTRAL + RP_METROPOLITANA_SUD\
+    + RP_CAMP_DE_TARRAGONA + RP_TERRES_DE_EBRE + RP_PONENT + RP_PIRINEU_OCCIDENTAL
+    
+comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD, 
+               "RP GIRONA":RP_GIRONA, 'RP CENTRAL':RP_CENTRAL, "RP METROPOLITANA SUD":RP_METROPOLITANA_SUD,
+               "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
+               "RP TERRES DE L'EBRE":RP_TERRES_DE_EBRE,"RP PONENT": RP_PONENT, 
+               "RP PIRINEU OCCIDENTAL": RP_PIRINEU_OCCIDENTAL}
+
+
+        
 
 
