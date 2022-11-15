@@ -85,24 +85,40 @@ RP_CENTRAL = ['Osona', 'Berguedà', 'Solsonès', 'Bages', 'Anoia', 'Moianès']
 RP_METROPOLITANA_SUD = ['Baix Llobregat', 'Garraf', 'Alt Penedès']
 RP_CAMP_DE_TARRAGONA = ['Baix Penedès', 'Alt Camp', 'Tarragonès', 'Conca de Barberà', 'Baix Camp','Priorat']
 RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
-RP_PONENT = ['Segrià', 'Garrigiues', "Pla d'Urgell", "Urgell","Segarra", "Noguera"]
-RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran"]
+RP_PONENT = ['Segrià', 'Garrigiues', "Pla d'Urgell", "Urgell","Segarra", "Noguera", "Garrigues"]
+RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran", "Cerdanya"]
 
+comarques = RP_METROPOLITANA_NORD + RP_GIRONA + RP_CENTRAL + RP_METROPOLITANA_SUD\
+    + RP_CAMP_DE_TARRAGONA + RP_TERRES_DE_EBRE + RP_PONENT + RP_PIRINEU_OCCIDENTAL
+    
 comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD, 
-               "RP GIRONA":RP_GIRONA, "RP METROPOLITANA SUD":RP_METROPOLITANA_SUD,
+               "RP GIRONA":RP_GIRONA, 'RP CENTRAL':RP_CENTRAL, "RP METROPOLITANA SUD":RP_METROPOLITANA_SUD,
                "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
                "RP TERRES DE L'EBRE":RP_TERRES_DE_EBRE,"RP PONENT": RP_PONENT, 
                "RP PIRINEU OCCIDENTAL": RP_PIRINEU_OCCIDENTAL}
-
-for value in cat["NOMCOMAR"].value_counts():
-    print(value in cat["NOMCOMAR"])
+print('len', len(comarques))
+for value in cat["NOMCOMAR"]:
+    if value not in comarques :
+        print(value)
 
 com_list = []
+ind = 0
+print(len(cat["NOMCOMAR"]))
 for comarca in cat["NOMCOMAR"]:
-    for key in comarq_dict.keys():
-        if comarca in comarq_dict[key]:
-            com_list.append(key)
-print(com_list)
+    for RP in comarq_dict.keys():
+        if comarca in comarq_dict[RP]:
+            com_list.append(RP)
+            ind += 1
+        elif comarca == 'Barcelonès':
+            muni = cat["NOMMUNI"][ind]
+            if muni != 'Barcelona':
+                com_list.append('RP METROPOLITANA NORD')
+                break
+            else:
+                com_list.append('RP BARCELONA')
+                break
+            
 
+cat.insert(11, 'DISAP', com_list)
 print(cat["NOMCOMAR"].value_counts())
 print(disap_data["regi_policial"].value_counts())
