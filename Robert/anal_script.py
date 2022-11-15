@@ -69,3 +69,40 @@ plt.legend(labels1)
 #%%
 
 print(disap_data.loc[disap_data["sexe"]=='Home'])
+
+#%%
+import geopandas as gpd
+
+cat = gpd.read_file('C:/Users/rober/OneDrive/Documents/master/dades_massives/data_analysis_project/Robert/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
+f, ax = plt.subplots(figsize=(10,10))
+cat.plot(ax = ax, color = "lightgray")
+
+#%%
+RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
+RP_GIRONA = ['Alt Empordà', 'Gironès', 'Selva', 'Garrotxa', 'Ripollès',
+             "Pla de l'Estany", "Baix Empordà"]
+RP_CENTRAL = ['Osona', 'Berguedà', 'Solsonès', 'Bages', 'Anoia', 'Moianès']
+RP_METROPOLITANA_SUD = ['Baix Llobregat', 'Garraf', 'Alt Penedès']
+RP_CAMP_DE_TARRAGONA = ['Baix Penedès', 'Alt Camp', 'Tarragonès', 'Conca de Barberà', 'Baix Camp','Priorat']
+RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
+RP_PONENT = ['Segrià', 'Garrigiues', "Pla d'Urgell", "Urgell","Segarra", "Noguera"]
+RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran"]
+
+comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD, 
+               "RP GIRONA":RP_GIRONA, "RP METROPOLITANA SUD":RP_METROPOLITANA_SUD,
+               "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
+               "RP TERRES DE L'EBRE":RP_TERRES_DE_EBRE,"RP PONENT": RP_PONENT, 
+               "RP PIRINEU OCCIDENTAL": RP_PIRINEU_OCCIDENTAL}
+
+for value in cat["NOMCOMAR"].value_counts():
+    print(value in cat["NOMCOMAR"])
+
+com_list = []
+for comarca in cat["NOMCOMAR"]:
+    for key in comarq_dict.keys():
+        if comarca in comarq_dict[key]:
+            com_list.append(key)
+print(com_list)
+
+print(cat["NOMCOMAR"].value_counts())
+print(disap_data["regi_policial"].value_counts())
