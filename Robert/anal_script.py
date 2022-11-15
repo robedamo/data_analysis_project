@@ -77,7 +77,7 @@ cat = gpd.read_file('C:/Users/rober/OneDrive/Documents/master/dades_massives/dat
 f, ax = plt.subplots(figsize=(10,10))
 cat.plot(ax = ax, color = "lightgray")
 
-#%%
+#%%DICTIONARY COMARQUES
 RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
 RP_GIRONA = ['Alt Empordà', 'Gironès', 'Selva', 'Garrotxa', 'Ripollès',
              "Pla de l'Estany", "Baix Empordà"]
@@ -85,7 +85,7 @@ RP_CENTRAL = ['Osona', 'Berguedà', 'Solsonès', 'Bages', 'Anoia', 'Moianès']
 RP_METROPOLITANA_SUD = ['Baix Llobregat', 'Garraf', 'Alt Penedès']
 RP_CAMP_DE_TARRAGONA = ['Baix Penedès', 'Alt Camp', 'Tarragonès', 'Conca de Barberà', 'Baix Camp','Priorat']
 RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
-RP_PONENT = ['Segrià', 'Garrigiues', "Pla d'Urgell", "Urgell","Segarra", "Noguera", "Garrigues"]
+RP_PONENT = ['Segrià', 'Garrigues', "Pla d'Urgell", "Urgell","Segarra", "Noguera"]
 RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran", "Cerdanya"]
 
 comarques = RP_METROPOLITANA_NORD + RP_GIRONA + RP_CENTRAL + RP_METROPOLITANA_SUD\
@@ -96,6 +96,7 @@ comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD,
                "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
                "RP TERRES DE L'EBRE":RP_TERRES_DE_EBRE,"RP PONENT": RP_PONENT, 
                "RP PIRINEU OCCIDENTAL": RP_PIRINEU_OCCIDENTAL}
+#check all the comarques are in the list except from Barcelonès
 print('len', len(comarques))
 for value in cat["NOMCOMAR"]:
     if value not in comarques :
@@ -111,14 +112,38 @@ for comarca in cat["NOMCOMAR"]:
             ind += 1
         elif comarca == 'Barcelonès':
             muni = cat["NOMMUNI"][ind]
+            print(muni, ind, comarca)
             if muni != 'Barcelona':
-                com_list.append('RP METROPOLITANA NORD')
+                if muni == "l'Hospitalet de Llobregat":
+                    com_list.append('RP METROPOLITANA SUD')
+                else:
+                    com_list.append('RP METROPOLITANA NORD')
+                ind += 1
                 break
             else:
-                com_list.append('RP BARCELONA')
+                com_list.append('RP METROPOLITANA BARCELONA')
+                ind += 1
                 break
             
-
-cat.insert(11, 'DISAP', com_list)
+#%%
+#cat.insert(11, 'RP', com_list)
+cat["RP"] = com_list
 print(cat["NOMCOMAR"].value_counts())
 print(disap_data["regi_policial"].value_counts())
+#%%RP MAPA
+
+new_map = cat[['RP','geometry']]
+reg_poli = new_map.dissolve(by = 'RP')
+reg_poli.insert(1, 'DISAP', disap_data["regi_policial"].value_counts())
+#%% 
+import matplotlib
+min_val, max_val = 0.3,1.0
+n = 10
+orig_cmap = plt.cm.Reds
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+reg_poli.plot(column='DISAP', cmap=cmap, legend=True)
+plt.axis('off')
+plt.title('Disappearences in RP in Catalonia')
+plt.show()
+#%%
