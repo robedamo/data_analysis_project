@@ -11,8 +11,10 @@ import matplotlib.pyplot as plt
 from sodapy import Socrata
 import numpy as np
 import geopandas as gpd
+import datetime
 
 #%%
+#Obtain the data using the API
 
 # Unauthenticated client only works with public data sets. Note 'None'
 # in place of application token, and no username or password:
@@ -29,10 +31,10 @@ client = Socrata("analisi.transparenciacatalunya.cat", None)
 results = client.get("qxev-y8x7", limit=7923)
 
 #%%
-
 # Convert to pandas DataFrame
 data_df = pd.DataFrame.from_records(results)
 
+#%%
 #We remove the data of 2022 (since there is only 3 values of different RP and ABP (not correlated))
 data_df = data_df.set_index('any')
 data_df = data_df.drop('2022')
@@ -103,23 +105,37 @@ mean_visites_RP = pd.DataFrame(data=mean_visites_RP, index=list_RP, columns=['Me
 
 #Plot the average number of visits per year for every RP
 mean_visites_RP.plot(kind='bar', ylabel='Average number fo visits per year', 
-                     rot=90, legend=False, )
+                     rot=90, legend=False)
 plt.tight_layout()
 
 
 #%%
 #We want to plot the average time that takes to be attended after entering the police department
 
+times_df = data_df[['mitjana_temps_espera']].copy()
+
+times_df['mitjana_temps_espera'] = pd.to_datetime(times_df['mitjana_temps_espera'])
+
+#%%
+
+print(times_df.mitjana_temps_espera.dt.minute) #to obtain the minutes
 
 
 
-'''
-data_df['mitjana_temps_espera'] = pd.to_datetime(data_df['mitjana_temps_espera'])
+
+#print(df.Date_time.dt.hour.head())
+
+#%%
+
+#time_format = '%H:%M:%S'
 
 data_df['mitjana_temps_espera'] = data_df['mitjana_temps_espera'].datatime.hour * 3600 + \
                                   data_df['mitjana_temps_espera'].datatime.minute * 60 + \
                                   data_df['mitjana_temps_espera'].datatime.second
-'''
+
+
+
+
 
 #%%
 #Plot with circles of different sizes?
