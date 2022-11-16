@@ -137,13 +137,44 @@ reg_poli = new_map.dissolve(by = 'RP')
 reg_poli.insert(1, 'DISAP', disap_data["regi_policial"].value_counts())
 #%% 
 import matplotlib
+RP_tot_pop = {'RP METROPOLITANA NORD':2195758, 
+               "RP GIRONA":766681, 'RP CENTRAL':530715, "RP METROPOLITANA SUD":1366442,
+               "RP CAMP DE TARRAGONA":637198, 
+               "RP TERRES DE L'EBRE":179574,"RP PONENT":367016, 
+               "RP PIRINEU OCCIDENTAL": 72913, "RP METROPOLITANA BARCELONA":1664182}
+#reg_poli.set_index("RP")
+for key in RP_tot_pop.keys():
+    print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
+    reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]*10000/RP_tot_pop[key]
 min_val, max_val = 0.3,1.0
-n = 10
+#%%
+n = 100
+f, ax = plt.subplots(figsize=(10,10))
+vmin = reg_poli.DISAP.min()
+vmax = reg_poli.DISAP.max()
 orig_cmap = plt.cm.Reds
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
-reg_poli.plot(column='DISAP', cmap=cmap, legend=True)
+#sm = plt.cm.ScalarMappable(cmap=cmap, norm=matplotlib.colors.LogNorm(vmin=vmin, vmax=vmax))
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
+cbar = f.colorbar(sm)
+cbar.set_label('Disappearences', fontsize = 12)
 plt.axis('off')
-plt.title('Disappearences in RP in Catalonia')
+plt.title('Disappearences in each RP in Catalonia per 10000 inhabitants', fontsize = 15)
 plt.show()
 #%%
+f, ax = plt.subplots(figsize=(10,10))
+vmin = reg_poli.DISAP.min()
+vmax = reg_poli.DISAP.max()
+orig_cmap = plt.cm.Reds
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+sm2 = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+
+reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
+cbar = f.colorbar(sm2)
+cbar.set_label('Disappearences', fontsize = 12)
+plt.axis('off')
+plt.title('Disappearences in each RP in Catalonia', fontsize = 15)
+plt.show()
