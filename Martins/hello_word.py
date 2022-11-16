@@ -162,21 +162,95 @@ plt.axhline(y, ls = '--', color = 'red', label = 'Mean of daily patrols of all R
 plt.legend()
 
 #%%
-"""
-Now we want to represent the mean number of daily patrols per inhabitant in 
-order to know if it is homogeneous
-"""
+#Now we will create a data frame with our data 
+rp_df = pd.DataFrame(serveis_list_new[1:], columns =['RP'])
+rp_df['daily patrols'] = pd.DataFrame(serveis_mean_patrols_list[1:])
 
-#Firs we import the data of the inhabitants for comarques and then we will
-#classify them for regions policials. 
-poblacio =  pd.read_excel('PoblacioRP.xlsx')
+#%%
+# """
+# Now we want to represent the mean number of daily patrols per inhabitant in 
+# order to know if it is homogeneous
+# """
 
-#Now we have to divide the number of mean daily patrols by the number of 
-#inhabitants. We see that they are not in the same format an order.
-print(poblacio)
-print(serveis_list_new)
+# #First we import the data of the inhabitants for comarques and then we will
+# #classify them for regions policials. 
+# poblacio =  pd.read_excel('PoblacioRP.xlsx')
 
+# rp_df_total=pd.DataFrame()
 
+# rp_df_total=rp_df.merge(poblacio)
+
+#%%
+#Map
+
+import geopandas as gpd
+
+cat = gpd.read_file('C:/Users/Martina/projectADM/data_analysis_project/Robert/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326", encoding='utf-8'
+                    )
+f, ax = plt.subplots(figsize=(10,10))
+cat.plot(ax = ax, color = "lightgray")
+
+#%%DICTIONARY COMARQUES
+RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
+RP_GIRONA = ['Alt Empordà', 'Gironès', 'Selva', 'Garrotxa', 'Ripollès',
+             "Pla de l'Estany", "Baix Empordà"]
+RP_CENTRAL = ['Osona', 'Berguedà', 'Solsonès', 'Bages', 'Anoia', 'Moianès']
+RP_METROPOLITANA_SUD = ['Baix Llobregat', 'Garraf', 'Alt Penedès']
+RP_CAMP_DE_TARRAGONA = ['Baix Penedès', 'Alt Camp', 'Tarragonès', 'Conca de Barberà', 'Baix Camp','Priorat']
+RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
+RP_PONENT = ['Segrià', 'Garrigues', "Pla d'Urgell", "Urgell","Segarra", "Noguera"]
+RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran", "Cerdanya"]
+
+comarques = RP_METROPOLITANA_NORD + RP_GIRONA + RP_CENTRAL + RP_METROPOLITANA_SUD\
+    + RP_CAMP_DE_TARRAGONA + RP_TERRES_DE_EBRE + RP_PONENT + RP_PIRINEU_OCCIDENTAL
+    
+comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD, 
+               "RP GIRONA":RP_GIRONA, 'RP CENTRAL':RP_CENTRAL, "RP METROPOLITANA SUD":RP_METROPOLITANA_SUD,
+               "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
+               "RP TERRES DE L'EBRE":RP_TERRES_DE_EBRE,"RP PONENT": RP_PONENT, 
+               "RP PIRINEU OCCIDENTAL": RP_PIRINEU_OCCIDENTAL}
+#check all the comarques are in the list except from Barcelonès
+print('len', len(comarques))
+for value in cat["NOMCOMAR"]:
+    if value not in comarques :
+        print(value)
+        
+#%%
+
+com_list = []
+ind = 0
+print(len(cat["NOMCOMAR"]))
+for comarca in cat["NOMCOMAR"]:
+    for RP in comarq_dict.keys():
+        if comarca in comarq_dict[RP]:
+            com_list.append(RP)
+            ind += 1
+        elif comarca == 'Barcelonès':
+            muni = cat["NOMMUNI"][ind]
+            print(muni, ind, comarca)
+            if muni != 'Barcelona':
+                if muni == "l'Hospitalet de Llobregat":
+                    com_list.append('RP METROPOLITANA SUD')
+                else:
+                    com_list.append('RP METROPOLITANA NORD')
+                ind += 1
+                break
+            else:
+                com_list.append('RP METROPOLITANA BARCELONA')
+                ind += 1
+                break
+            
+#%%
+#cat.insert(11, 'RP', com_list)
+cat["RP"] = com_list
+print(cat["NOMCOMAR"].value_counts())
+
+new_map = cat[['RP','geometry']]
+reg_poli = new_map.dissolve(by = 'RP')
+
+#%% 
+f, ax = plt.subplots(figsize=(10,10))
+reg_poli.plot(ax = ax, color = "lightgray")
         
 
 
