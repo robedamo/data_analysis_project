@@ -73,7 +73,12 @@ for i in range(0,50):
     counts += 2
 age_df2 = age_df2.set_index("Age")
 #%% PLOT BAR PLOT
-age_df2.plot(kind='bar',ylabel ='Disappearences per year', xlabel = 'Ages(years)', stacked=False, color=['skyblue', 'red'])
+age_df2.plot(kind='bar',
+             width = 0.7,
+             ylabel ='Disappearences per year', 
+             xlabel = 'Ages(years)', 
+             stacked=False, 
+             color=['skyblue', 'red'])
 #%% HISTO
 plt.figure()
 plt.xlabel('Age (years)')
@@ -85,11 +90,10 @@ plt.legend()
 plt.show()
 #%% PIE
 
-plt.pie(disap_data["sexe"].value_counts())
+plt.pie(disap_data["sexe"].value_counts(),
+        wedgeprops=dict(width=0.5),
+        autopct='%1.0f%%')
 plt.legend(labels1)
-#%%
-
-print(disap_data.loc[disap_data["sexe"]=='Home'])
 
 #%% MAPS, GEOPANDAS
 import geopandas as gpd
@@ -109,9 +113,12 @@ RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
 RP_PONENT = ['Segrià', 'Garrigues', "Pla d'Urgell", "Urgell","Segarra", "Noguera"]
 RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran", "Cerdanya"]
 
+#list with all comarques
+
 comarques = RP_METROPOLITANA_NORD + RP_GIRONA + RP_CENTRAL + RP_METROPOLITANA_SUD\
     + RP_CAMP_DE_TARRAGONA + RP_TERRES_DE_EBRE + RP_PONENT + RP_PIRINEU_OCCIDENTAL
-    
+
+#dictionary of comarques sorted by RP
 comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD, 
                "RP GIRONA":RP_GIRONA, 'RP CENTRAL':RP_CENTRAL, "RP METROPOLITANA SUD":RP_METROPOLITANA_SUD,
                "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
@@ -123,6 +130,7 @@ for value in cat["NOMCOMAR"]:
     if value not in comarques :
         print(value)
 
+#we will add a row to the original geopandas dataframe with the RPs
 com_list = []
 ind = 0
 print(len(cat["NOMCOMAR"]))
@@ -147,7 +155,7 @@ for comarca in cat["NOMCOMAR"]:
                 break
             
 #%%
-#cat.insert(11, 'RP', com_list)
+#cat.insert(11, 'RP', com_list) #Activate in 1st run
 cat["RP"] = com_list
 print(cat["NOMCOMAR"].value_counts())
 print(disap_data["regi_policial"].value_counts())
