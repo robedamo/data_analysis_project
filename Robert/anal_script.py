@@ -43,17 +43,38 @@ x = np.linspace(0,100,21)
 mc = disap_data.loc[disap_data["sexe"]=='Dona']["edat"].reset_index()
 fm = disap_data.loc[disap_data["sexe"]=='Home']["edat"].reset_index()
 #data frame for each gender, disappearences per age
-ages = np.linspace(0,100, 101)
+ages = np.linspace(1,100, 100)
 age_df = pd.DataFrame(columns = ["Age", "Male" , "Female"])
 for age in ages:
-    new_df = pd.DataFrame([{"Age":age,"Male":mc[mc.edat == age].shape[0],"Female":fm[fm.edat == age].shape[0]}])
+    new_df = pd.DataFrame([{"Age":int(age),"Male":mc[mc.edat == age].shape[0],"Female":fm[fm.edat == age].shape[0]}])
     age_df = pd.concat([age_df, new_df], axis=0, ignore_index=True)
     
 age_df = age_df.set_index("Age")
-#%%
+#%% BAR PLOT AGE GROUPED BY 2
+counts = 2
 
-age_df.plot(kind='bar',ylabel ='Disappearences per year', xlabel = 'Ages(years)', stacked=False, color=['skyblue', 'red'])
-#%%
+age_l_m = []
+age_l_f = []
+for age in range(0,99,2):
+    pair = age_df["Male"].iloc[age]
+    pair += age_df["Male"].iloc[age+1]
+    age_l_m.append(pair)
+
+for age in range(0,99,2):
+    pair = age_df["Female"].iloc[age]
+    pair += age_df["Female"].iloc[age+1]
+    age_l_f.append(pair)
+    
+age_df2 = pd.DataFrame(columns = ["Age", "Male" , "Female"])
+
+for i in range(0,50):
+    new_df = pd.DataFrame([{"Age":str(counts-2)+'-'+str(counts),"Male":age_l_m[i],"Female":age_l_f[i]}])
+    age_df2 = pd.concat([age_df2, new_df], axis=0, ignore_index=True)
+    counts += 2
+age_df2 = age_df2.set_index("Age")
+#%% PLOT BAR PLOT
+age_df2.plot(kind='bar',ylabel ='Disappearences per year', xlabel = 'Ages(years)', stacked=False, color=['skyblue', 'red'])
+#%% HISTO
 plt.figure()
 plt.xlabel('Age (years)')
 plt.xticks(x)
@@ -62,7 +83,7 @@ labels1 = ["Male", "Female"]
 sns.histplot(disap_data["edat"],bins = x, kde =True, color = 'blue', multiple="stack")
 plt.legend()
 plt.show()
-#%%
+#%% PIE
 
 plt.pie(disap_data["sexe"].value_counts())
 plt.legend(labels1)
@@ -70,7 +91,7 @@ plt.legend(labels1)
 
 print(disap_data.loc[disap_data["sexe"]=='Home'])
 
-#%%
+#%% MAPS, GEOPANDAS
 import geopandas as gpd
 
 cat = gpd.read_file('C:/Users/rober/OneDrive/Documents/master/dades_massives/data_analysis_project/Robert/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
@@ -162,19 +183,4 @@ cbar = f.colorbar(sm)
 cbar.set_label('Disappearences', fontsize = 12)
 plt.axis('off')
 plt.title('Disappearences in each RP in Catalonia per 10000 inhabitants', fontsize = 15)
-plt.show()
-#%%
-f, ax = plt.subplots(figsize=(10,10))
-vmin = reg_poli.DISAP.min()
-vmax = reg_poli.DISAP.max()
-orig_cmap = plt.cm.Reds
-colors = orig_cmap(np.linspace(min_val, max_val, n))
-cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
-sm2 = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
-
-reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
-cbar = f.colorbar(sm2)
-cbar.set_label('Disappearences', fontsize = 12)
-plt.axis('off')
-plt.title('Disappearences in each RP in Catalonia', fontsize = 15)
 plt.show()
