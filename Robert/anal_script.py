@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib
 #!/usr/bin/env python
 
 # make sure to install these packages before running:
@@ -73,12 +74,16 @@ for i in range(0,50):
     counts += 2
 age_df2 = age_df2.set_index("Age")
 #%% PLOT BAR PLOT
-age_df2.plot(kind='bar',
-             width = 0.7,
-             ylabel ='Disappearences per year', 
-             xlabel = 'Ages(years)', 
+f, ax = plt.subplots(figsize = (14,10))
+ax.set_xlabel('Ages(years)',fontsize = 18)
+ax.set_ylabel('Disappearances per 2 years', fontsize = 18)
+age_df2.plot(ax = ax, kind='bar',
+             width = 0.8,
              stacked=False, 
-             color=['skyblue', 'red'])
+             xlabel = "Age (years)",
+             color=['skyblue', 'red'],
+             fontsize = 17)
+plt.legend(["Male", "Female"], prop={'size': 16})
 #%% HISTO
 plt.figure()
 plt.xlabel('Age (years)')
@@ -89,11 +94,13 @@ sns.histplot(disap_data["edat"],bins = x, kde =True, color = 'blue', multiple="s
 plt.legend()
 plt.show()
 #%% PIE
-
+labels1 = ["Male", "Female"]
 plt.pie(disap_data["sexe"].value_counts(),
         wedgeprops=dict(width=0.5),
         autopct='%1.0f%%')
 plt.legend(labels1)
+
+print(disap_data.loc[disap_data["sexe"]=='Home'])
 
 #%% MAPS, GEOPANDAS
 import geopandas as gpd
@@ -165,7 +172,6 @@ new_map = cat[['RP','geometry']]
 reg_poli = new_map.dissolve(by = 'RP')
 reg_poli.insert(1, 'DISAP', disap_data["regi_policial"].value_counts())
 #%% 
-import matplotlib
 RP_tot_pop = {'RP METROPOLITANA NORD':2195758, 
                "RP GIRONA":766681, 'RP CENTRAL':530715, "RP METROPOLITANA SUD":1366442,
                "RP CAMP DE TARRAGONA":637198, 
@@ -175,8 +181,9 @@ RP_tot_pop = {'RP METROPOLITANA NORD':2195758,
 for key in RP_tot_pop.keys():
     print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
     reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]*10000/RP_tot_pop[key]
-min_val, max_val = 0.3,1.0
+
 #%%
+min_val, max_val = 0.3,1.0
 n = 100
 f, ax = plt.subplots(figsize=(10,10))
 vmin = reg_poli.DISAP.min()
@@ -184,11 +191,33 @@ vmax = reg_poli.DISAP.max()
 orig_cmap = plt.cm.Reds
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
-#sm = plt.cm.ScalarMappable(cmap=cmap, norm=matplotlib.colors.LogNorm(vmin=vmin, vmax=vmax))
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
 cbar = f.colorbar(sm)
-cbar.set_label('Disappearences', fontsize = 12)
+cbar.set_label('Disappearances', fontsize = 15)
+cbar.ax.tick_params(labelsize=15)
 plt.axis('off')
-plt.title('Disappearences in each RP in Catalonia per 10000 inhabitants', fontsize = 15)
+plt.title('Disappearances in each RP in Catalonia per 10000 inhabitants', fontsize = 18)
+plt.show()
+
+#%%
+for key in RP_tot_pop.keys():
+    print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
+    reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]
+#%%
+min_val, max_val = 0.3,1.0
+n = 100
+f, ax = plt.subplots(figsize=(10,10))
+vmin = reg_poli.DISAP.min()
+vmax = reg_poli.DISAP.max()
+orig_cmap = plt.cm.Reds
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
+cbar = f.colorbar(sm)
+cbar.set_label('Disappearances', fontsize = 15)
+cbar.ax.tick_params(labelsize=15)
+plt.axis('off')
+plt.title('Disappearances in each RP in Catalonia', fontsize = 18)
 plt.show()
