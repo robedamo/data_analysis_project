@@ -9,11 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib
-#!/usr/bin/env python
-
-# make sure to install these packages before running:
-# pip install pandas
-# pip install sodapy
 
 from sodapy import Socrata
 
@@ -34,12 +29,6 @@ results = client.get("bp4b-qsst", limit = 10000)
 disap_data = pd.DataFrame.from_records(results)
 disap_data["edat"] = disap_data["edat"].astype('int')
 x = np.linspace(0,100,21)
-# plt.figure()
-# plt.hist(disap_data["edat"],density=False, 
-#                         bins = x)
-# plt.xlabel('Age (yrs)')
-# plt.show()
-
 
 mc = disap_data.loc[disap_data["sexe"]=='Dona']["edat"].reset_index()
 fm = disap_data.loc[disap_data["sexe"]=='Home']["edat"].reset_index()
@@ -51,6 +40,16 @@ for age in ages:
     age_df = pd.concat([age_df, new_df], axis=0, ignore_index=True)
     
 age_df = age_df.set_index("Age")
+
+#calculating total adult disappearances by gender
+dis_adult_m = 0
+dis_adult_w = 0
+
+for age in range(18,61):
+    dis_adult_m += age_df.loc[age]["Male"]
+    dis_adult_w += age_df.loc[age]["Female"]
+    
+print("Adult male missing = ", dis_adult_m, "Adult female missing =", dis_adult_w)
 #%% BAR PLOT AGE GROUPED BY 2
 counts = 2
 
