@@ -12,6 +12,7 @@ from sodapy import Socrata
 import numpy as np
 import geopandas as gpd
 import datetime
+import matplotlib
 
 #%%
 #Obtain the data using the API
@@ -113,6 +114,7 @@ mean_visites_RP = pd.DataFrame(data=mean_visites_RP, index=list_RP, columns=['Me
 mean_visites_RP.plot(kind='bar', ylabel='Average number fo visits per year', 
                      rot=90, legend=False)
 plt.tight_layout()
+plt.savefig('number_visits_RP.png')
 
 visites_RP = visites_RP.reset_index()
 
@@ -128,10 +130,15 @@ time_RP = time_RP.set_index('regi_policial_rp')
 for RP in list_RP:
     specific_RP = time_RP.loc[RP]
     # Compute the mean for all RPs and append into the list
-    mean_time_RP.append(sum(specific_RP.nombre_de_visites)/number_of_years)
+    mean_time_RP.append(sum(specific_RP.mitjana_temps_espera)/len(specific_RP))
 
+mean_time_RP = pd.DataFrame(data=mean_time_RP, index=list_RP, columns=['Mean waiting time'])
 
-
+# Plot the average number of visits per year for every RP
+mean_time_RP.plot(kind='bar', ylabel='Average waiting (min)', 
+                     rot=90, legend=False)
+plt.tight_layout()
+plt.savefig('waiting_time_RP.png')
 
 
 time_RP = time_RP.reset_index()
@@ -140,14 +147,132 @@ time_RP = time_RP.reset_index()
 
 #%%
 # We want to plot two maps of the RP for the mean visits in a year and the average
-# time of being attended.
+# time of being attended. This is done using geopandas.
+
+cat = gpd.read_file('/Users/nilmasocastro/Desktop/MSc/Subjects/Data_analysis/group_repository/data_analysis_project/Robert/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
+
+#%% DICTIONARY COMARQUES
+RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
+RP_GIRONA = ['Alt Empordà', 'Gironès', 'Selva', 'Garrotxa', 'Ripollès',
+             "Pla de l'Estany", "Baix Empordà"]
+RP_CENTRAL = ['Osona', 'Berguedà', 'Solsonès', 'Bages', 'Anoia', 'Moianès']
+RP_METROPOLITANA_SUD = ['Baix Llobregat', 'Garraf', 'Alt Penedès']
+RP_CAMP_DE_TARRAGONA = ['Baix Penedès', 'Alt Camp', 'Tarragonès', 'Conca de Barberà', 'Baix Camp','Priorat']
+RP_TERRES_DE_EBRE = ["Ribera d'Ebre", "Terra Alta","Baix Ebre", "Montsià"]
+RP_PONENT = ['Segrià', 'Garrigues', "Pla d'Urgell", "Urgell","Segarra", "Noguera"]
+RP_PIRINEU_OCCIDENTAL = ["Pallars Jussà","Alt Urgell", "Pallars Sobirà", "Alta Ribagorça", "Val d'Aran", "Cerdanya"]
+
+# list with all comarques
+comarques = RP_METROPOLITANA_NORD + RP_GIRONA + RP_CENTRAL + RP_METROPOLITANA_SUD\
+    + RP_CAMP_DE_TARRAGONA + RP_TERRES_DE_EBRE + RP_PONENT + RP_PIRINEU_OCCIDENTAL
+
+# dictionary of comarques sorted by RP
+comarq_dict = {'RP Metropolitana Nord':RP_METROPOLITANA_NORD, 
+               'RP Girona':RP_GIRONA, 'RP Central':RP_CENTRAL, 'RP Metropolitana Sud':RP_METROPOLITANA_SUD,
+               'RP Camp de Tarragona':RP_CAMP_DE_TARRAGONA, 
+               "RP Terres de l'Ebre":RP_TERRES_DE_EBRE,'RP Ponent': RP_PONENT, 
+               'RP Pirineu Occidental': RP_PIRINEU_OCCIDENTAL}
+
+#%%
+# we will add a column to the original geopandas dataframe with the RPs
+com_list = []
+ind = 0
+
+for comarca in cat["NOMCOMAR"]:
+    for RP in comarq_dict.keys():
+        if comarca in comarq_dict[RP]:
+            com_list.append(RP)
+            ind += 1
+        elif comarca == 'Barcelonès':
+            muni = cat["NOMMUNI"][ind]
+            print(muni, ind, comarca)
+            if muni != 'Barcelona':
+                if muni == "l'Hospitalet de Llobregat":
+                    com_list.append('RP Metropolitana Sud')
+                else:
+                    com_list.append('RP Metropolitana Nord')
+                ind += 1
+                break
+            else:
+                com_list.append('RP Metropolitana Barcelona')
+                ind += 1
+                break
+
+cat['RP'] = com_list # we add a new column with every RP
+
+# We create a new dataframe with the data to plot
+map_regi = cat[['RP','geometry']]
+map_regi = map_regi.dissolve(by = 'RP')
+
+map_regi['Mean number of visits'] = 0 # we create a new blank column
+map_regi['Mean waiting time'] = 0
 
 
+# we write our data into this map_regi geopandas dataframe
+for RP in list_RP:
+    map_regi.loc[RP,'Mean number of visits'] = mean_visites_RP.loc[RP,'Mean number of visits']
+    map_regi.loc[RP,'Mean waiting time'] = mean_time_RP.loc[RP,'Mean waiting time']
+    
+
+
+#%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP
+
+f, ax = plt.subplots(figsize=(8,8))
+cat.plot(ax = ax, color = "lightgray")
+
+
+plt.title('Average number of visits per year in each RP')
+plt.axis(False)
+
+min_val, max_val = 0.3,1.0
+n = 100
+vmin = map_regi['Mean number of visits'].min()
+vmax = map_regi['Mean number of visits'].max()
+orig_cmap = plt.cm.cividis
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+cbar = f.colorbar(sm)
+cbar.set_label('Mean number of visits per year', fontsize = 12)
+cbar.ax.tick_params(labelsize=12)
+plt.tight_layout()
+
+map_regi.plot(ax = ax, column='Mean number of visits', cmap=cmap)
+
+f.savefig('cat_visits.png')
+plt.show()
+
+#%% PLOT FOR AVERAGE WAITING TIME IN EACH RP
+
+f, ax = plt.subplots(figsize=(8,8))
+cat.plot(ax = ax, color = "lightgray")
+
+
+plt.title('Average waiting time in each RP')
+plt.axis(False)
+
+min_val, max_val = 0.3,1.0
+n = 100
+vmin = map_regi['Mean waiting time'].min()
+vmax = map_regi['Mean waiting time'].max()
+orig_cmap = plt.cm.cividis
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+cbar = f.colorbar(sm)
+cbar.set_label('Mean waiting time (min)', fontsize = 12)
+cbar.ax.tick_params(labelsize=12)
+plt.tight_layout()
+
+map_regi.plot(ax = ax, column='Mean waiting time', cmap=cmap)
+
+f.savefig('cat_time.png')
+plt.show()
 
 #%%
 
 #counts = data_df.value_counts()
-#ABP_Granollers_mes_visites = ABP_Granollers[['mes','nombre_de_visites']]
+
 #time_RP.regi_policial_rp.value_counts()[RP] # to acces the value in a Pandas Series
 ##############################################
 
