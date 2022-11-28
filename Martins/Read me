@@ -1,0 +1,62 @@
+# learn-git-a-bit
+In this repository you can find the code, plots and files needed for the study of the ditribution of daily patrols per police region in Catalonia between 2020 and 2021.
+
+The study takes into account the area of the police regions and the inhabitants of them.
+
+
+Code:
+
+  -"daily_patrols_project.py": python code that contains the last version used in order to obtain the results 
+  
+  -"hello_word.py": python code that has been modified in order to achieve the last version
+
+
+Plots:
+
+  -"dailypatrolsRP.png": bar plot of the daily patrols per RP (blue) with a line (red) that represents the total mean of daily patrols
+  
+  -"map_area.png": map of Catalonia divided by RP that represents logarithm of the number of daily patrols per RP per area in km^2
+  
+  -"map_mean_daily_patrols.png": map of Catalonia divided by RP that represents the daily patrols per RP
+  
+  -"map_popu.png": map of Catalonia divided by RP that represents the daily patrols per 100.000 inhabitants per RP
+  
+  -"mapa.png": plot of all the results together
+
+
+Files: 
+
+  -Files necessaries to plot the maps. 
+  
+   The set of files contains the limits of the "municipis", "comarques","vagueries", "províncies", Catalonia and "caps de municipi, 
+   comarca i província" with a multiscale base.
+   
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.cpg"
+     
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.dbf"
+     
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.prj"
+     
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.sbn"
+     
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.sbx"
+     
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.shp"
+     
+     -"divisions-administratives-v2r1-municipis-1000000-20220801.shx"
+     
+  
+  -File necessary to compute the number of inhabitants per RP.
+  
+   This data contains thirteen columns: region, ratio of penalties per 1000 inhabitants,
+   total of penalties, the article violated and its state (columns 4 to 12) and the population.
+   
+     -"pobl.csv"
+     
+   
+   -File necessary to compute the area of the RP.
+   
+   The data consist of seven columns: "comarca", different altitude zones (columns 2 to 6) and the area expressed in km2
+    
+     -"area_comarca.csv"
+      
