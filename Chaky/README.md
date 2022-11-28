@@ -62,7 +62,7 @@ Files:
      -"divisions-administratives-v2r1-municipis-1000000-20220801.shx"
      
   
-  -File necessary to compute the number of inhabitants per RP: .
+  -File necessary to compute the number of inhabitants per RP: "PoblacioRP.xlsx".
      
      
 All data used has been extracted from:
