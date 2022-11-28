@@ -161,14 +161,15 @@ for comarca in cat["NOMCOMAR"]:
                 break
             
 #%%
-#cat.insert(11, 'RP', com_list) #Activate in 1st run
+cat.insert(11, 'RP', com_list) #Activate in 1st run
 cat["RP"] = com_list
 print(cat["NOMCOMAR"].value_counts())
 print(disap_data["regi_policial"].value_counts())
 #%%RP MAPA
 
 new_map = cat[['RP','geometry']]
-reg_poli = new_map.dissolve(by = 'RP')
+reg_poli = new_map.dissolve(by = 'RP', as_index = True)
+#reg_poli = reg_poli.set_index("RP")
 reg_poli.insert(1, 'DISAP', disap_data["regi_policial"].value_counts())
 #%% 
 RP_tot_pop = {'RP METROPOLITANA NORD':2195758, 
@@ -176,27 +177,39 @@ RP_tot_pop = {'RP METROPOLITANA NORD':2195758,
                "RP CAMP DE TARRAGONA":637198, 
                "RP TERRES DE L'EBRE":179574,"RP PONENT":367016, 
                "RP PIRINEU OCCIDENTAL": 72913, "RP METROPOLITANA BARCELONA":1664182}
-#reg_poli.set_index("RP")
+
 for key in RP_tot_pop.keys():
     print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
-    reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]*10000/RP_tot_pop[key]
+    reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]#*100000/RP_tot_pop[key]
 
+reg_poli['RP_new']=['\n RP CAMP DE TARRAGONA', 'RP CENTRAL', 'RP GIRONA',
+                    'RP METROPOLITANA BARCELONA', 'RP METROPOLITANA NORD', 
+                    '\n\n RP METROPOLITANA SUD', 'RP PIRINEU OCCIDENTAL',
+                    'RP PONENT', "RP TERRES DE L'EBRE"]
 #%%
-min_val, max_val = 0.3,1.0
+min_val, max_val = 0.1,1.0
 n = 100
 f, ax = plt.subplots(figsize=(10,10))
 vmin = reg_poli.DISAP.min()
 vmax = reg_poli.DISAP.max()
-orig_cmap = plt.cm.Reds
+orig_cmap = plt.cm.YlOrRd
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
 cbar = f.colorbar(sm)
-cbar.set_label('Disappearances', fontsize = 15)
+cbar.set_label('Disappearances per 100.000 inhabitants', fontsize = 15)
 cbar.ax.tick_params(labelsize=15)
 plt.axis('off')
-plt.title('Disappearances in each RP in Catalonia per 10000 inhabitants', fontsize = 18)
+
+reg_poli = reg_poli.reset_index()
+
+for index, row in reg_poli.iterrows():
+    xy = row['geometry'].centroid.coords[:]
+    xytext = row['geometry'].centroid.coords[:]
+    plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=8)
+    plt.axis('off')
+#plt.title('Disappearances in Catalonia per 100.000 inhabitants', fontsize = 18)
 plt.show()
 
 #%%
@@ -204,19 +217,28 @@ for key in RP_tot_pop.keys():
     print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
     reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]
 #%%
-min_val, max_val = 0.3,1.0
+min_val, max_val = 0.1,1.0
 n = 100
 f, ax = plt.subplots(figsize=(10,10))
 vmin = reg_poli.DISAP.min()
 vmax = reg_poli.DISAP.max()
-orig_cmap = plt.cm.Reds
+orig_cmap = plt.cm.YlOrRd
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 reg_poli.plot(ax = ax, column='DISAP', cmap=cmap, label = "a", legend=False)
+
+reg_poli = reg_poli.reset_index()
+
+for index, row in reg_poli.iterrows():
+    xy = row['geometry'].centroid.coords[:]
+    xytext = row['geometry'].centroid.coords[:]
+    plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=8)
+    plt.axis('off')
+    
 cbar = f.colorbar(sm)
-cbar.set_label('Disappearances', fontsize = 15)
+cbar.set_label('Total Disappearances', fontsize = 15)
 cbar.ax.tick_params(labelsize=15)
 plt.axis('off')
-plt.title('Disappearances in each RP in Catalonia', fontsize = 18)
+#plt.title('Disappearances in Catalonia', fontsize = 18)
 plt.show()
