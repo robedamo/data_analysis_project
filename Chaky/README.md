@@ -12,7 +12,7 @@ Article:
 Code:
 
   -"Chaky_Police.ipynb": python code that contains the last version used in order to obtain the results.
-  -"Pandas_Chaky": ipython notebook where I could work on the better understanding of pandas by picking Franz's brain.
+  -"Pandas_Fran_Chaky": ipython notebook where I could work on the better understanding of pandas by picking Franz's (Chaotique in GitHub) brain.
   
   The following libraries with the corresponding versions have been used:
   
@@ -26,19 +26,24 @@ Code:
 
 
 Plots:
-First there has been some imaging to gasp a better knowledge of the subject and try to visualize the more meaningful subjects to cover.
 
-The plots that where finaly most valuable were the following:
+-Imatges:
 
-  -"dailypatrolsRP.png": bar plot of the daily patrols per RP (blue) with a line (red) that represents the total mean of daily patrols
+  First there has been some imaging to gasp a better knowledge of the subject and try to visualize the more meaningful subjects to cover.
+
+-Imatges ppt:
+
+  The plots that where finaly most valuable were the following:
+
+  -"Edat_autor_victima.png": bar plot of the number of hate crimes agressors (blue) and victims (orange) for a given age.
   
-  -"map_area.png": map of Catalonia divided by RP that represents logarithm of the number of daily patrols per RP per area in km^2
+  -"Edats.png": bar plot of the population in Catalonia for a given age group.
   
-  -"map_mean_daily_patrols.png": map of Catalonia divided by RP that represents the daily patrols per RP
+  -"Prop_victima_autor.png": scatter map of the ratio victim/agressor for a given age.
   
-  -"map_popu.png": map of Catalonia divided by RP that represents the daily patrols per 100.000 inhabitants per RP
+  -"Map_Chaky_Marcelo.png": map of Catalonia divided by RP (Police Region) that represents the number of hate crimes.
   
-  -"mapa.png": plot of all the results together
+  -"Density_Map_Chaky_Marcelo.png": same as the image above but normalized for the population for each RP.
 
 
 Files: 
