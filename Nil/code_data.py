@@ -267,10 +267,10 @@ plt.show()
 MAP PLOTS
 """
 
-map_regi['RP_new']=['\n RP Camp de Tarragona', 'RP Central', 'RP Girona',
-                    'RP Metropolitana Barcelona', 'RP Metropolitana Nord', 
-                    '\n\n RP Metropolitana Sud', 'RP Pirineu Occidental',
-                    'RP Ponent', "RP Terres de l'Ebre"]
+map_regi['RP_new']=['\n RP CAMP DE TARRAGONA', 'RP CENTRAL', 'RP GIRONA',
+                    'RP METROPOLITANA BARCELONA', 'RP METROPOLITANA NORD', 
+                    '\n\n RP METROPOLITANA SUD', 'RP PIRINEU OCCIDENTAL',
+                    'RP PONENT', "RP TERRES DE L'EBRE"]
 
 #%%
 f, ax = plt.subplots(figsize=(10,10))
@@ -372,9 +372,9 @@ map_regi.plot(column='Mean number of visits 100000',
               ax=ax, 
               legend=True, 
               cmap="YlOrRd",
-              legend_kwds={'label': "Mean number of visits per 100.000 inhabitants"})
+              legend_kwds={'label': "Average number of visits per 100.000 inhabitants"}, fontsize=13)
 
-plt.title('Average number of visits in each RP per 100.000 inhabitants', fontsize=15)
+plt.title('Average number of visits in per 100.000 inhabitants', fontsize=15)
 
 map_regi = map_regi.reset_index()
 
