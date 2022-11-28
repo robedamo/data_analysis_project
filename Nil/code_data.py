@@ -100,7 +100,18 @@ mes_visites.plot(kind='bar', title='ABP '+ABP, xticks=(), xlabel='Year', ylabel=
 # We want to plot the number of visits in every RP from 2011 to 2021
 
 # We create a DataFrame with 2 columns with the RP and number of visits
-visites_RP = data_df[['regi_policial_rp','nombre_de_visites']].copy()
+#visites_RP = data_df[['regi_policial_rp','nombre_de_visites']].copy()
+
+
+
+
+new_df = data_df[['regi_policial_rp','nombre_de_visites','any']].copy()
+
+new_df = new_df[new_df['any'] > '2019']
+
+visites_RP = new_df.copy()
+
+
 
 # Write all the RPs in a list
 list_RP = [i for i in (visites_RP['regi_policial_rp'].value_counts()).index]
@@ -111,7 +122,8 @@ visites_RP = visites_RP.set_index('regi_policial_rp')
 for RP in list_RP:
     specific_RP = visites_RP.loc[RP]
     # Compute the mean for all RPs, round the number and append into the list
-    mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/number_of_years, decimals=0))
+    #mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/number_of_years, decimals=0))
+    mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/2, decimals=0))
 
 mean_visites_RP = [int(i) for i in mean_visites_RP] #transform the mean visits into integers
 
@@ -216,7 +228,7 @@ map_regi = map_regi.dissolve(by = 'RP')
 map_regi['Mean number of visits'] = 0 # we create a new blank column
 map_regi['Mean waiting time'] = 0
 
-
+#%%
 # we write our data into this map_regi geopandas dataframe
 for RP in list_RP:
     map_regi.loc[RP,'Mean number of visits'] = mean_visites_RP.loc[RP,'Mean number of visits']
@@ -353,16 +365,16 @@ map_regi.plot(ax = ax, column='Mean number of visits 100000', cmap=cmap)
 f.savefig('cat_visits_100000.png')
 plt.show()
 
-#%%
+#%% PLOT PRESENTATION
 
 f, ax = plt.subplots(figsize=(10,10))
 map_regi.plot(column='Mean number of visits 100000', 
               ax=ax, 
               legend=True, 
               cmap="YlOrRd",
-              legend_kwds={'label': "Mean number of visits"})
+              legend_kwds={'label': "Mean number of visits per 100.000 inhabitants"})
 
-plt.title('Average number of visits per RP', fontsize=13)
+plt.title('Average number of visits in each RP per 100.000 inhabitants', fontsize=15)
 
 map_regi = map_regi.reset_index()
 
@@ -373,7 +385,6 @@ for index, row in map_regi.iterrows():
     plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
     plt.axis(False)
 
-plt.tight_layout()
 f.savefig('cat_visits_100000_yorld.png')
 plt.show()
 
