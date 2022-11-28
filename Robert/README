@@ -1,0 +1,19 @@
+In this folder you will find the code in order to obtain the results from the mini-article in .pdf format also present in the folder.
+The code (anal_script.py) is written in python using the following libraries and versions:
+
+numpy >  1.20
+
+matplotlib > 3.4
+
+notebook  (Jupyter notebook)
+
+matplotlib-inline  > 0.1.2
+
+seaborn > 0.11
+
+pandas > 1.3.3
+
+geopandas >  0.12.1
+
+The maps present in the folder have been downloaded from: https://www.icgc.cat/Administracio-i-empresa/Descarregues/Capes-de-geoinformacio/Mapes-municipals
+The dataset used has been collected from Dades obertes de Catalunya: https://analisi.transparenciacatalunya.cat/Seguretat/Den-ncies-de-persones-desaparegudes/bp4b-qsst
