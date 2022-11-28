@@ -75,14 +75,23 @@ number_of_years = 10 # to divide and obtain the mean for all years (from 2011 to
 
 #%%
 # Specific ABP
-ABP = 'Alt Urgell'
+ABP = 'Granollers'
 single_ABP = data_df[data_df['rea_b_sica_policial_abp'] == 'ABP ' + ABP]
 
-mes_visites = pd.DataFrame({'Mes':single_ABP.loc[:,'nom_mes'], 'Nombre visites':single_ABP.loc[:,'nombre_de_visites']})
-mes_visites = mes_visites.set_index('Mes')
+mes_visites = pd.DataFrame({'Any':single_ABP.loc[:,'any'], 'Nombre visites':single_ABP.loc[:,'nombre_de_visites']})
+mes_visites = mes_visites.set_index('Any')
+
+xticks_list = np.empty(number_of_years*12, dtype=tuple)
+xticks_list = xticks_list.tolist()
+
+for i in range(0,number_of_years*12):
+    if (i % 12) == 0:
+        xticks_list.insert(i,tuple(2011+i//12))
+    else:
+        xticks_list.insert(i,'')
 
 # To plot the number of visits in one specific ABP
-mes_visites.plot(kind='bar', title='ABP '+ABP, xlabel='Month', ylabel='Number of visits', 
+mes_visites.plot(kind='bar', title='ABP '+ABP, xticks=(), xlabel='Year', ylabel='Number of visits', 
                  rot=60, stacked=False, legend=False)
 
 
@@ -213,6 +222,8 @@ for RP in list_RP:
     map_regi.loc[RP,'Mean number of visits'] = mean_visites_RP.loc[RP,'Mean number of visits']
     map_regi.loc[RP,'Mean waiting time'] = mean_time_RP.loc[RP,'Mean waiting time']
     
+    
+
 
 
 #%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP
@@ -224,11 +235,11 @@ cat.plot(ax = ax, color = "lightgray")
 plt.title('Average number of visits per year in each RP')
 plt.axis(False)
 
-min_val, max_val = 0.3,1.0
+min_val, max_val = 0.1,1.0
 n = 100
 vmin = map_regi['Mean number of visits'].min()
 vmax = map_regi['Mean number of visits'].max()
-orig_cmap = plt.cm.cividis
+orig_cmap = plt.cm.Reds
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
@@ -251,11 +262,11 @@ cat.plot(ax = ax, color = "lightgray")
 plt.title('Average waiting time in each RP')
 plt.axis(False)
 
-min_val, max_val = 0.3,1.0
+min_val, max_val = 0.1,1.0
 n = 100
 vmin = map_regi['Mean waiting time'].min()
 vmax = map_regi['Mean waiting time'].max()
-orig_cmap = plt.cm.cividis
+orig_cmap = plt.cm.Reds
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
@@ -267,6 +278,74 @@ plt.tight_layout()
 map_regi.plot(ax = ax, column='Mean waiting time', cmap=cmap)
 
 f.savefig('cat_time.png')
+plt.show()
+
+
+
+#%% DENSITY
+
+RP_tot_pop = {'RP Metropolitana Nord':2195758, 
+               "RP Girona":766681, 'RP Central':530715, "RP Metropolitana Sud":1366442,
+               "RP Camp de Tarragona":637198, 
+               "RP Terres de l'Ebre":179574,"RP Ponent":367016, 
+               "RP Pirineu Occidental": 72913, "RP Metropolitana Barcelona":1664182}
+#reg_poli.set_index("RP")
+for key in RP_tot_pop.keys():
+    map_regi.at[key, "Mean number of visits"] = map_regi.at[key, "Mean number of visits"]*10000/RP_tot_pop[key]
+    map_regi.at[key, "Mean waiting time"] = map_regi.at[key, "Mean waiting time"]*10000/RP_tot_pop[key]
+    
+#%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP FOR 10000 HABITANTS
+
+f, ax = plt.subplots(figsize=(8,8))
+cat.plot(ax = ax, color = "lightgray")
+
+
+plt.title('Average number of visits per year in each RP for 10000 habitants')
+plt.axis(False)
+
+min_val, max_val = 0.1,1.0
+n = 100
+vmin = map_regi['Mean number of visits'].min()
+vmax = map_regi['Mean number of visits'].max()
+orig_cmap = plt.cm.Reds
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+cbar = f.colorbar(sm)
+cbar.set_label('Mean number of visits per year', fontsize = 12)
+cbar.ax.tick_params(labelsize=12)
+plt.tight_layout()
+
+map_regi.plot(ax = ax, column='Mean number of visits', cmap=cmap)
+
+f.savefig('cat_visits_10000.png')
+plt.show()
+
+#%% PLOT FOR AVERAGE WAITING TIME IN EACH RP FOR 10000 HABITANTS
+
+f, ax = plt.subplots(figsize=(8,8))
+cat.plot(ax = ax, color = "lightgray")
+
+
+plt.title('Average waiting time in each RP for 10000 habitants')
+plt.axis(False)
+
+min_val, max_val = 0.1,1.0
+n = 100
+vmin = map_regi['Mean waiting time'].min()
+vmax = map_regi['Mean waiting time'].max()
+orig_cmap = plt.cm.Reds
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+cbar = f.colorbar(sm)
+cbar.set_label('Mean waiting time (min)', fontsize = 12)
+cbar.ax.tick_params(labelsize=12)
+plt.tight_layout()
+
+map_regi.plot(ax = ax, column='Mean waiting time', cmap=cmap)
+
+f.savefig('cat_time_10000.png')
 plt.show()
 
 #%%
