@@ -222,9 +222,6 @@ for RP in list_RP:
     map_regi.loc[RP,'Mean number of visits'] = mean_visites_RP.loc[RP,'Mean number of visits']
     map_regi.loc[RP,'Mean waiting time'] = mean_time_RP.loc[RP,'Mean waiting time']
     
-    
-
-
 
 #%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP
 
@@ -232,7 +229,7 @@ f, ax = plt.subplots(figsize=(8,8))
 cat.plot(ax = ax, color = "lightgray")
 
 
-plt.title('Average number of visits per year in each RP')
+plt.title('Average number of visits per year in each RP', fontsize=13)
 plt.axis(False)
 
 min_val, max_val = 0.1,1.0
@@ -253,13 +250,45 @@ map_regi.plot(ax = ax, column='Mean number of visits', cmap=cmap)
 f.savefig('cat_visits.png')
 plt.show()
 
+#%%
+"""
+MAP PLOTS
+"""
+
+map_regi['RP_new']=['\n RP Camp de Tarragona', 'RP Central', 'RP Girona',
+                    'RP Metropolitana Barcelona', 'RP Metropolitana Nord', 
+                    '\n\n RP Metropolitana Sud', 'RP Pirineu Occidental',
+                    'RP Ponent', "RP Terres de l'Ebre"]
+
+#%%
+f, ax = plt.subplots(figsize=(10,10))
+map_regi.plot(column='Mean number of visits', 
+              ax=ax, 
+              legend=True, 
+              cmap="YlOrRd",
+              legend_kwds={'label': "Mean number of visits"})
+
+plt.title('Average number of visits per RP', fontsize=13)
+
+map_regi = map_regi.reset_index()
+
+for index, row in map_regi.iterrows():
+    print(row)
+    xy = row['geometry'].centroid.coords[:]
+    xytext = row['geometry'].centroid.coords[:]
+    plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
+    plt.axis(False)
+
+plt.show()
+
+
 #%% PLOT FOR AVERAGE WAITING TIME IN EACH RP
 
 f, ax = plt.subplots(figsize=(8,8))
 cat.plot(ax = ax, color = "lightgray")
 
 
-plt.title('Average waiting time in each RP')
+plt.title('Average waiting time in each RP', fontsize=13)
 plt.axis(False)
 
 min_val, max_val = 0.1,1.0
@@ -282,52 +311,79 @@ plt.show()
 
 
 
-#%% DENSITY
+#%% DENSITY per 100000 habitants
 
 RP_tot_pop = {'RP Metropolitana Nord':2195758, 
                "RP Girona":766681, 'RP Central':530715, "RP Metropolitana Sud":1366442,
                "RP Camp de Tarragona":637198, 
                "RP Terres de l'Ebre":179574,"RP Ponent":367016, 
                "RP Pirineu Occidental": 72913, "RP Metropolitana Barcelona":1664182}
-#reg_poli.set_index("RP")
+
+map_regi['Mean number of visits 100000'] = 0
+map_regi['Mean waiting time 100000'] = 0
+
 for key in RP_tot_pop.keys():
-    map_regi.at[key, "Mean number of visits"] = map_regi.at[key, "Mean number of visits"]*10000/RP_tot_pop[key]
-    map_regi.at[key, "Mean waiting time"] = map_regi.at[key, "Mean waiting time"]*10000/RP_tot_pop[key]
+    map_regi.at[key, "Mean number of visits 100000"] = map_regi.at[key, "Mean number of visits"]*100000/RP_tot_pop[key]
+    map_regi.at[key, "Mean waiting time 100000"] = map_regi.at[key, "Mean waiting time"]*100000/RP_tot_pop[key]
     
-#%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP FOR 10000 HABITANTS
+#%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP FOR 100000 HABITANTS
 
 f, ax = plt.subplots(figsize=(8,8))
 cat.plot(ax = ax, color = "lightgray")
 
 
-plt.title('Average number of visits per year in each RP for 10000 habitants')
+plt.title('Average number of visits per year in each RP for 100000 habitants', fontsize=13)
 plt.axis(False)
 
 min_val, max_val = 0.1,1.0
 n = 100
-vmin = map_regi['Mean number of visits'].min()
-vmax = map_regi['Mean number of visits'].max()
+vmin = map_regi['Mean number of visits 100000'].min()
+vmax = map_regi['Mean number of visits 100000'].max()
 orig_cmap = plt.cm.Reds
 colors = orig_cmap(np.linspace(min_val, max_val, n))
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
 cbar = f.colorbar(sm)
-cbar.set_label('Mean number of visits per year', fontsize = 12)
+cbar.set_label('Mean number of visits per year per 100000', fontsize = 12)
 cbar.ax.tick_params(labelsize=12)
 plt.tight_layout()
 
-map_regi.plot(ax = ax, column='Mean number of visits', cmap=cmap)
+map_regi.plot(ax = ax, column='Mean number of visits 100000', cmap=cmap)
 
-f.savefig('cat_visits_10000.png')
+f.savefig('cat_visits_100000.png')
 plt.show()
 
-#%% PLOT FOR AVERAGE WAITING TIME IN EACH RP FOR 10000 HABITANTS
+#%%
+
+f, ax = plt.subplots(figsize=(10,10))
+map_regi.plot(column='Mean number of visits 100000', 
+              ax=ax, 
+              legend=True, 
+              cmap="YlOrRd",
+              legend_kwds={'label': "Mean number of visits"})
+
+plt.title('Average number of visits per RP', fontsize=13)
+
+map_regi = map_regi.reset_index()
+
+for index, row in map_regi.iterrows():
+    print(row)
+    xy = row['geometry'].centroid.coords[:]
+    xytext = row['geometry'].centroid.coords[:]
+    plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
+    plt.axis(False)
+
+plt.tight_layout()
+f.savefig('cat_visits_100000_yorld.png')
+plt.show()
+
+#%% PLOT FOR AVERAGE WAITING TIME IN EACH RP FOR 100000 HABITANTS
 
 f, ax = plt.subplots(figsize=(8,8))
 cat.plot(ax = ax, color = "lightgray")
 
 
-plt.title('Average waiting time in each RP for 10000 habitants')
+plt.title('Average waiting time in each RP for 100000 habitants', fontsize=13)
 plt.axis(False)
 
 min_val, max_val = 0.1,1.0
@@ -345,7 +401,7 @@ plt.tight_layout()
 
 map_regi.plot(ax = ax, column='Mean waiting time', cmap=cmap)
 
-f.savefig('cat_time_10000.png')
+f.savefig('cat_time_100000.png')
 plt.show()
 
 #%%
