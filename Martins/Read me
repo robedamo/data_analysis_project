@@ -1,14 +1,29 @@
-# learn-git-a-bit
-In this repository you can find the code, plots and files needed for the study of the ditribution of daily patrols per police region in Catalonia between 2020 and 2021.
+# Martina
+
+In this folder you can find the code, plots and files needed for the study of the ditribution of daily patrols per police region in Catalonia between 2020 and 2021. The article of the study can be also found here.
 
 The study takes into account the area of the police regions and the inhabitants of them.
 
+
+Article:
+
+  -"MiniArticle_Martina_Moreno.pdf"
 
 Code:
 
   -"daily_patrols_project.py": python code that contains the last version used in order to obtain the results 
   
   -"hello_word.py": python code that has been modified in order to achieve the last version
+  
+  The following libraries with the corresponding versions have been used:
+  
+    numpy >  1.20
+
+    matplotlib > 3.4
+
+    pandas > 1.3.3
+
+    geopandas >  0.12.1
 
 
 Plots:
@@ -51,12 +66,24 @@ Files:
    This data contains thirteen columns: region, ratio of penalties per 1000 inhabitants,
    total of penalties, the article violated and its state (columns 4 to 12) and the population.
    
-     -"pobl.csv"
-     
+     -"pobl.csv"    
    
    -File necessary to compute the area of the RP.
    
    The data consist of seven columns: "comarca", different altitude zones (columns 2 to 6) and the area expressed in km2
     
      -"area_comarca.csv"
-      
+     
+     
+All data used has been extracted from:
+
+  https://www.amb.cat/es/web/area-metropolitana/municipis-metropolitans 
+  
+  https://www.naciodigital.cat/manresa/noticia/98203/denuncies-primer-estat-alarma-catalunya-pendents-tc
+  
+  https://www.icgc.cat/Descarregues/Cartografia-vectorial/Divisions-administratives 
+  
+  https://www.idescat.cat/indicadors/?id=aec&n=15182 
+  
+  https://analisi.transparenciacatalunya.cat/Seguretat/Mitjana-de-patrulles-di-ries-de-la-Policia-de-la-G/vvp8-t2ai 
+
