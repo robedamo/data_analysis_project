@@ -12,6 +12,7 @@ Article:
 Code:
 
   -"Chaky_Police.ipynb": python code that contains the last version used in order to obtain the results.
+  -"Pandas_Chaky": ipython notebook where I could work on the better understanding of pandas by picking Franz's brain.
   
   The following libraries with the corresponding versions have been used:
   
