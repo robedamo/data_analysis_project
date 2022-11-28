@@ -11,7 +11,7 @@ Article:
 
 Code:
 
-  -"daily_patrols_project.py": python code that contains the last version used in order to obtain the results 
+  -"Chaky_Police.ipynb": python code that contains the last version used in order to obtain the results.
   
   The following libraries with the corresponding versions have been used:
   
@@ -25,6 +25,9 @@ Code:
 
 
 Plots:
+First there has been some imaging to gasp a better knowledge of the subject and try to visualize the more meaningful subjects to cover.
+
+The plots that where finaly most valuable were the following:
 
   -"dailypatrolsRP.png": bar plot of the daily patrols per RP (blue) with a line (red) that represents the total mean of daily patrols
   
@@ -59,18 +62,7 @@ Files:
      -"divisions-administratives-v2r1-municipis-1000000-20220801.shx"
      
   
-  -File necessary to compute the number of inhabitants per RP.
-  
-   This data contains thirteen columns: region, ratio of penalties per 1000 inhabitants,
-   total of penalties, the article violated and its state (columns 4 to 12) and the population.
-   
-     -"pobl.csv"    
-   
-   -File necessary to compute the area of the RP.
-   
-   The data consist of seven columns: "comarca", different altitude zones (columns 2 to 6) and the area expressed in km2
-    
-     -"area_comarca.csv"
+  -File necessary to compute the number of inhabitants per RP: .
      
      
 All data used has been extracted from:
@@ -83,4 +75,4 @@ All data used has been extracted from:
   
   https://www.idescat.cat/indicadors/?id=aec&n=15182 
   
-  https://analisi.transparenciacatalunya.cat/Seguretat/Mitjana-de-patrulles-di-ries-de-la-Policia-de-la-G/vvp8-t2ai 
+  https://analisi.transparenciacatalunya.cat/Seguretat/V-ctimes-o-persones-autores-de-delictes-d-odi-i-di/gci6-2ubm
