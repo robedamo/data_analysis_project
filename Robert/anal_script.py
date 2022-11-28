@@ -27,13 +27,18 @@ client = Socrata("analisi.transparenciacatalunya.cat", None)
 results = client.get("bp4b-qsst", limit = 10000)
 # Convert to pandas DataFrame
 disap_data = pd.DataFrame.from_records(results)
+
+#converting age to ints
+
 disap_data["edat"] = disap_data["edat"].astype('int')
+
 x = np.linspace(0,100,21)
 
+#creating a dataframe with disappearances by age and gender
 mc = disap_data.loc[disap_data["sexe"]=='Dona']["edat"].reset_index()
 fm = disap_data.loc[disap_data["sexe"]=='Home']["edat"].reset_index()
-#data frame for each gender, disappearences per age
 ages = np.linspace(1,100, 100)
+
 age_df = pd.DataFrame(columns = ["Age", "Male" , "Female"])
 for age in ages:
     new_df = pd.DataFrame([{"Age":int(age),"Male":mc[mc.edat == age].shape[0],"Female":fm[fm.edat == age].shape[0]}])
@@ -50,21 +55,28 @@ for age in range(18,61):
     dis_adult_w += age_df.loc[age]["Female"]
     
 print("Adult male missing = ", dis_adult_m, "Adult female missing =", dis_adult_w)
-#%% BAR PLOT AGE GROUPED BY 2
+#%% BAR PLOT AGE GROUPED BY 2 YEARS
 counts = 2
 
 age_l_m = []
 age_l_f = []
+#from the dataframe we created for each age, we create anotherone that has 2  
+#consecutive ages in each row
+
+# generate male col
 for age in range(0,99,2):
     pair = age_df["Male"].iloc[age]
     pair += age_df["Male"].iloc[age+1]
     age_l_m.append(pair)
 
+#generate female col
 for age in range(0,99,2):
     pair = age_df["Female"].iloc[age]
     pair += age_df["Female"].iloc[age+1]
     age_l_f.append(pair)
-    
+
+#create df
+
 age_df2 = pd.DataFrame(columns = ["Age", "Male" , "Female"])
 
 for i in range(0,50):
@@ -72,7 +84,7 @@ for i in range(0,50):
     age_df2 = pd.concat([age_df2, new_df], axis=0, ignore_index=True)
     counts += 2
 age_df2 = age_df2.set_index("Age")
-#%% PLOT BAR PLOT
+#%% PLOT BAR PLOT grouped by 2 yrs
 f, ax = plt.subplots(figsize = (14,10))
 ax.set_xlabel('Ages(years)',fontsize = 18)
 ax.set_ylabel('Disappearances per 2 years', fontsize = 18)
@@ -83,7 +95,7 @@ age_df2.plot(ax = ax, kind='bar',
              color=['skyblue', 'red'],
              fontsize = 17)
 plt.legend(["Male", "Female"], prop={'size': 16})
-#%% HISTO
+#%%  every 5 years
 plt.figure()
 plt.xlabel('Age (years)')
 plt.xticks(x)
@@ -92,7 +104,7 @@ labels1 = ["Male", "Female"]
 sns.histplot(disap_data["edat"],bins = x, kde =True, color = 'blue', multiple="stack")
 plt.legend()
 plt.show()
-#%% PIE
+#%% PIE chart
 labels1 = ["Male", "Female"]
 plt.pie(disap_data["sexe"].value_counts(),
         wedgeprops=dict(width=0.5),
@@ -106,9 +118,12 @@ import geopandas as gpd
 
 cat = gpd.read_file('C:/Users/rober/OneDrive/Documents/master/dades_massives/data_analysis_project/Robert/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
 f, ax = plt.subplots(figsize=(10,10))
-cat.plot(ax = ax, color = "lightgray")
+#cat.plot(ax = ax, color = "lightgray")
 
 #%%DICTIONARY COMARQUES
+
+#we create a dict wit {RP1:[comarques in RP1], ...}
+
 RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
 RP_GIRONA = ['Alt Empordà', 'Gironès', 'Selva', 'Garrotxa', 'Ripollès',
              "Pla de l'Estany", "Baix Empordà"]
@@ -130,6 +145,7 @@ comarq_dict = {'RP METROPOLITANA NORD':RP_METROPOLITANA_NORD,
                "RP CAMP DE TARRAGONA":RP_CAMP_DE_TARRAGONA, 
                "RP TERRES DE L'EBRE":RP_TERRES_DE_EBRE,"RP PONENT": RP_PONENT, 
                "RP PIRINEU OCCIDENTAL": RP_PIRINEU_OCCIDENTAL}
+
 #check all the comarques are in the list except from Barcelonès
 print('len', len(comarques))
 for value in cat["NOMCOMAR"]:
@@ -165,28 +181,31 @@ cat.insert(11, 'RP', com_list) #Activate in 1st run
 cat["RP"] = com_list
 print(cat["NOMCOMAR"].value_counts())
 print(disap_data["regi_policial"].value_counts())
-#%%RP MAPA
+#%% NEW RP MAP
 
 new_map = cat[['RP','geometry']]
-reg_poli = new_map.dissolve(by = 'RP', as_index = True)
+reg_poli = new_map.dissolve(by = 'RP', as_index = True)#dissolving by RP so we 
+#get the polygons we are interested in
 #reg_poli = reg_poli.set_index("RP")
 reg_poli.insert(1, 'DISAP', disap_data["regi_policial"].value_counts())
 #%% 
+#dict of population in each RP
 RP_tot_pop = {'RP METROPOLITANA NORD':2195758, 
                "RP GIRONA":766681, 'RP CENTRAL':530715, "RP METROPOLITANA SUD":1366442,
                "RP CAMP DE TARRAGONA":637198, 
                "RP TERRES DE L'EBRE":179574,"RP PONENT":367016, 
                "RP PIRINEU OCCIDENTAL": 72913, "RP METROPOLITANA BARCELONA":1664182}
-
+#putting the numbers in the gpd df
 for key in RP_tot_pop.keys():
     print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
     reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]#*100000/RP_tot_pop[key]
 
+#new row for the labels
 reg_poli['RP_new']=['\n RP CAMP DE TARRAGONA', 'RP CENTRAL', 'RP GIRONA',
                     'RP METROPOLITANA BARCELONA', 'RP METROPOLITANA NORD', 
                     '\n\n RP METROPOLITANA SUD', 'RP PIRINEU OCCIDENTAL',
                     'RP PONENT', "RP TERRES DE L'EBRE"]
-#%%
+#%% PLOTTING MAP
 min_val, max_val = 0.1,1.0
 n = 100
 f, ax = plt.subplots(figsize=(10,10))
@@ -212,11 +231,8 @@ for index, row in reg_poli.iterrows():
 #plt.title('Disappearances in Catalonia per 100.000 inhabitants', fontsize = 18)
 plt.show()
 
-#%%
-for key in RP_tot_pop.keys():
-    print(reg_poli.at[key, "DISAP"]/RP_tot_pop[key])
-    reg_poli.at[key, "DISAP"] = reg_poli.at[key, "DISAP"]
-#%%
+
+#%% NOT NORMALIZED
 min_val, max_val = 0.1,1.0
 n = 100
 f, ax = plt.subplots(figsize=(10,10))
