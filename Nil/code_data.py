@@ -100,16 +100,14 @@ mes_visites.plot(kind='bar', title='ABP '+ABP, xticks=(), xlabel='Year', ylabel=
 # We want to plot the number of visits in every RP from 2011 to 2021
 
 # We create a DataFrame with 2 columns with the RP and number of visits
-#visites_RP = data_df[['regi_policial_rp','nombre_de_visites']].copy()
+visites_RP = data_df[['regi_policial_rp','nombre_de_visites']].copy()
 
 
+#new_df = data_df[['regi_policial_rp','nombre_de_visites','any']].copy()
 
+#new_df = new_df[new_df['any'] > '2019']
 
-new_df = data_df[['regi_policial_rp','nombre_de_visites','any']].copy()
-
-new_df = new_df[new_df['any'] > '2019']
-
-visites_RP = new_df.copy()
+#visites_RP = new_df.copy()
 
 
 
@@ -130,10 +128,12 @@ mean_visites_RP = [int(i) for i in mean_visites_RP] #transform the mean visits i
 # Create a new DataFrame in order to plot
 mean_visites_RP = pd.DataFrame(data=mean_visites_RP, index=list_RP, columns=['Mean number of visits'])
 
+#%%
 
 # Plot the average number of visits per year for every RP
+
 mean_visites_RP.plot(kind='bar', ylabel='Average number fo visits per year', 
-                     rot=90, legend=False)
+                     rot=90, legend=False, stacked=True)
 plt.tight_layout()
 plt.savefig('number_visits_RP.png')
 
@@ -155,9 +155,15 @@ for RP in list_RP:
 
 mean_time_RP = pd.DataFrame(data=mean_time_RP, index=list_RP, columns=['Mean waiting time'])
 
+
+#%%
 # Plot the average number of visits per year for every RP
-mean_time_RP.plot(kind='bar', ylabel='Average waiting (min)', 
+mean_time_RP.plot(kind='bar', ylabel='Average waiting time (min)', 
                      rot=90, legend=False)
+
+y = np.mean(time_RP.mitjana_temps_espera)
+plt.axhline(y, ls = '--', color = 'red')
+plt.text(3, 16, 'Mean', fontsize=10, color='red')
 plt.tight_layout()
 plt.savefig('waiting_time_RP.png')
 
@@ -170,7 +176,8 @@ time_RP = time_RP.reset_index()
 # We want to plot two maps of the RP for the mean visits in a year and the average
 # time of being attended. This is done using geopandas.
 
-cat = gpd.read_file('/Users/nilmasocastro/Desktop/MSc/Subjects/Data_analysis/group_repository/data_analysis_project/Robert/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
+#cat = gpd.read_file('/Users/nilmasocastro/Desktop/MSc/Subjects/Data_analysis/group_repository/data_analysis_project/Nil/divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
+cat = gpd.read_file('divisions-administratives-v2r1-municipis-1000000-20220801.shp', crs="EPSG:4326")
 
 #%% DICTIONARY COMARQUES
 RP_METROPOLITANA_NORD = ["Maresme", 'Vallès Occidental', 'Vallès Oriental']
@@ -234,6 +241,15 @@ for RP in list_RP:
     map_regi.loc[RP,'Mean number of visits'] = mean_visites_RP.loc[RP,'Mean number of visits']
     map_regi.loc[RP,'Mean waiting time'] = mean_time_RP.loc[RP,'Mean waiting time']
     
+#%%
+"""
+MAP PLOTS
+"""
+
+map_regi['RP_new']=['\n RP CAMP DE TARRAGONA', 'RP CENTRAL', 'RP GIRONA',
+                    'RP METROPOLITANA BARCELONA', 'RP METROPOLITANA NORD', 
+                    '\n\n RP METROPOLITANA SUD', 'RP PIRINEU OCCIDENTAL',
+                    'RP PONENT', "RP TERRES DE L'EBRE"]
 
 #%% PLOT FOR AVERAGE NUMBER OF VISITS PER YEAR IN EACH RP
 
@@ -262,37 +278,26 @@ map_regi.plot(ax = ax, column='Mean number of visits', cmap=cmap)
 f.savefig('cat_visits.png')
 plt.show()
 
-#%%
-"""
-MAP PLOTS
-"""
 
-map_regi['RP_new']=['\n RP CAMP DE TARRAGONA', 'RP CENTRAL', 'RP GIRONA',
-                    'RP METROPOLITANA BARCELONA', 'RP METROPOLITANA NORD', 
-                    '\n\n RP METROPOLITANA SUD', 'RP PIRINEU OCCIDENTAL',
-                    'RP PONENT', "RP TERRES DE L'EBRE"]
-
-#%%
+#%% FOR GROUP PRESENTATION
 f, ax = plt.subplots(figsize=(10,10))
 map_regi.plot(column='Mean number of visits', 
               ax=ax, 
               legend=True, 
               cmap="YlOrRd",
-              legend_kwds={'label': "Mean number of visits"})
+              legend_kwds={'label': "Average number of visits"})
 
-plt.title('Average number of visits per RP', fontsize=13)
 
 map_regi = map_regi.reset_index()
 
 for index, row in map_regi.iterrows():
-    print(row)
     xy = row['geometry'].centroid.coords[:]
     xytext = row['geometry'].centroid.coords[:]
     plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
     plt.axis(False)
 
+f.savefig('cat_visits_yorld.png')
 plt.show()
-
 
 #%% PLOT FOR AVERAGE WAITING TIME IN EACH RP
 
@@ -321,7 +326,25 @@ map_regi.plot(ax = ax, column='Mean waiting time', cmap=cmap)
 f.savefig('cat_time.png')
 plt.show()
 
+#%% FOR GROUP PRESENTATION
+f, ax = plt.subplots(figsize=(10,10))
+map_regi.plot(column='Mean waiting time', 
+              ax=ax, 
+              legend=True, 
+              cmap="YlOrRd",
+              legend_kwds={'label': "Average waiting time (min)"})
 
+
+map_regi = map_regi.reset_index()
+
+for index, row in map_regi.iterrows():
+    xy = row['geometry'].centroid.coords[:]
+    xytext = row['geometry'].centroid.coords[:]
+    plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
+    plt.axis(False)
+
+f.savefig('cat_time_yorld.png')
+plt.show()
 
 #%% DENSITY per 100000 habitants
 
@@ -372,9 +395,8 @@ map_regi.plot(column='Mean number of visits 100000',
               ax=ax, 
               legend=True, 
               cmap="YlOrRd",
-              legend_kwds={'label': "Average number of visits per 100.000 inhabitants"}, fontsize=13)
+              legend_kwds={'label': "Average number of visits per 100.000 inhabitants"})
 
-plt.title('Average number of visits in per 100.000 inhabitants', fontsize=15)
 
 map_regi = map_regi.reset_index()
 

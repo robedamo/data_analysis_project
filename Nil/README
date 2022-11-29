@@ -1,0 +1,29 @@
+In this folder you can find the code, plots and geopandas for studying the number of visits that a police office has (in order to file a complaint) and the waiting time between entering the building to file the complaint and being attended. 
+The data analyzed is from 2011 to 2021, updated monthly. For the whole group analysis the data analyzed has been restricted to 2020 and 2021.
+
+
+The code 'code_data.py' is written in Python (version 3.8.5) and allow us to process the data and obtain the plots.
+
+The libraries used:
+  
+    numpy >  1.23.4
+
+    matplotlib > 3.6.2
+
+    pandas > 1.5.1
+
+    geopandas >  0.12.1
+
+The dataset used in this study has been collected by Dades Obertes de Catalunya. The source: https://analisi.transparenciacatalunya.cat/Seguretat/Temps-d-espera-per-interposar-den-ncia-a-depend-nc/qxev-y8x7
+
+From the source https://www.icgc.cat/Administracio-i-empresa/Descarregues/Capes-de-geoinformacio/Mapes-municipals we obtain the files to plot the 'municipis' and 'comarques' in Catalonia. These has been processed by my colleague Robert in order to only have the 9 'Regions Policials' (RP) that are in Catalonia.
+These files are necessary in order to plot the maps:
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.cpg'
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.dbf'
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.prj'
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.sbn'
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.sbx'
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.shp'
+     -'divisions-administratives-v2r1-municipis-1000000-20220801.shx'
+
+
