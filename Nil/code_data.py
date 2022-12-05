@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 from sodapy import Socrata
 import numpy as np
 import geopandas as gpd
-import datetime
 import matplotlib
 
 #%%
@@ -73,8 +72,8 @@ data_df['mitjana_temps_espera'] = times_df['mitjana_temps_espera']
 number_of_years = 10 # to divide and obtain the mean for all years (from 2011 to 2021)
 
 
-#%%
-# Specific ABP
+#%% SPECIFIC ABP
+# Obtain the number of visits in an specific ABP
 ABP = 'Granollers'
 single_ABP = data_df[data_df['rea_b_sica_policial_abp'] == 'ABP ' + ABP]
 
@@ -103,13 +102,14 @@ mes_visites.plot(kind='bar', title='ABP '+ABP, xticks=(), xlabel='Year', ylabel=
 visites_RP = data_df[['regi_policial_rp','nombre_de_visites']].copy()
 
 
+# IF WE WANT TO CONSTRAIN THE YEARS
 #new_df = data_df[['regi_policial_rp','nombre_de_visites','any']].copy()
 
 #new_df = new_df[new_df['any'] > '2019']
 
 #visites_RP = new_df.copy()
 
-
+#####
 
 # Write all the RPs in a list
 list_RP = [i for i in (visites_RP['regi_policial_rp'].value_counts()).index]
@@ -120,8 +120,8 @@ visites_RP = visites_RP.set_index('regi_policial_rp')
 for RP in list_RP:
     specific_RP = visites_RP.loc[RP]
     # Compute the mean for all RPs, round the number and append into the list
-    #mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/number_of_years, decimals=0))
-    mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/2, decimals=0))
+    mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/number_of_years, decimals=0))
+    #mean_visites_RP.append(np.round(sum(specific_RP.nombre_de_visites)/2, decimals=0))
 
 mean_visites_RP = [int(i) for i in mean_visites_RP] #transform the mean visits into integers
 
@@ -275,7 +275,7 @@ plt.tight_layout()
 
 map_regi.plot(ax = ax, column='Mean number of visits', cmap=cmap)
 
-f.savefig('cat_visits.png')
+f.savefig('cat_visits_reds.png')
 plt.show()
 
 
@@ -296,6 +296,7 @@ for index, row in map_regi.iterrows():
     plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
     plt.axis(False)
 
+plt.tight_layout()
 f.savefig('cat_visits_yorld.png')
 plt.show()
 
@@ -343,8 +344,17 @@ for index, row in map_regi.iterrows():
     plt.annotate(row['RP_new'], xy=xy[0], xytext=xytext[0], horizontalalignment='center', verticalalignment='center', fontsize=9)
     plt.axis(False)
 
+plt.tight_layout()
 f.savefig('cat_time_yorld.png')
 plt.show()
+
+
+
+
+
+
+
+
 
 #%% DENSITY per 100000 habitants
 
@@ -436,23 +446,5 @@ map_regi.plot(ax = ax, column='Mean waiting time', cmap=cmap)
 
 f.savefig('cat_time_100000.png')
 plt.show()
-
-#%%
-
-#counts = data_df.value_counts()
-
-#time_RP.regi_policial_rp.value_counts()[RP] # to acces the value in a Pandas Series
-##############################################
-
-#Typo problem from 2017, where there is only 1 blankspace between RP and Metropolitana
-#RP_Metropolitana_nord = data_df[data_df['regi_policial_rp'] == 'RP Metropolitana Nord']
-#RP_Metropolitana_nord_2 = data_df[data_df['regi_policial_rp'] == 'RP  Metropolitana Nord']
-
-#Also, from 'gener 2021' the month name is written all in lowercase
-
-
-
-
-
 
 
